@@ -1460,7 +1460,7 @@ def setup_parser() -> argparse.ArgumentParser:
         "--blocks_to_swap",
         type=int,
         default=None,
-        help="number of blocks to swap in the model, max XXX / モデル内のブロックの数、最大XXX",
+        help="number of blocks to swap in the model, max 36 / モデル内のブロックの数、最大36",
     )
     parser.add_argument(
         "--img_in_txt_in_offloading",

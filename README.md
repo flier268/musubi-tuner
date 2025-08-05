@@ -61,6 +61,9 @@ If you find this project helpful, please consider supporting its development via
 
 - GitHub Discussions Enabled: We've enabled GitHub Discussions for community Q&A, knowledge sharing, and technical information exchange. Please use Issues for bug reports and feature requests, and Discussions for questions and sharing experiences. [Join the conversation →](https://github.com/kohya-ss/musubi-tuner/discussions)
 
+- August 5, 2025:
+    - **Code Quality Improvements**: Added common prompt parsing utilities to eliminate code duplication between WAN and HunyuanVideo modules. Unified image and video resizing methods for consistency. Improved warning messages in attention modules with actionable guidance.
+
 - August 2, 2025:
     - Reduced peak memory usage during model loading for FramePack and Wan2.1 when using `--fp8_scaled`. This reduces VRAM usage during model loading before training and inference.
 

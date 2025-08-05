@@ -45,11 +45,11 @@
 
 ## Introduction
 
-This repository provides scripts for training LoRA (Low-Rank Adaptation) models with HunyuanVideo, Wan2.1, FramePack and FLUX.1 Kontext architectures. 
+This repository provides scripts for training LoRA (Low-Rank Adaptation) models with HunyuanVideo, Wan2.1/2.2, FramePack and FLUX.1 Kontext architectures. 
 
-This repository is unofficial and not affiliated with the official HunyanVideo/Wan2.1/FramePack/FLUX.1 Kontext repositories. 
+This repository is unofficial and not affiliated with the official HunyanVideo/Wan2.1/Wan2.2/FramePack/FLUX.1 Kontext repositories. 
 
-For Wan2.1, please also refer to [Wan2.1 documentation](./docs/wan.md). For FramePack, please also refer to [FramePack documentation](./docs/framepack.md). For FLUX.1 Kontext, please refer to [FLUX.1 Kontext documentation](./docs/flux_kontext.md).
+For Wan2.1/2.2, please also refer to [Wan2.1/2.2 documentation](./docs/wan.md). For FramePack, please also refer to [FramePack documentation](./docs/framepack.md). For FLUX.1 Kontext, please refer to [FLUX.1 Kontext documentation](./docs/flux_kontext.md).
 
 *This repository is under development.*
 
@@ -63,9 +63,10 @@ If you find this project helpful, please consider supporting its development via
 
 - August 5, 2025:
     - **Code Quality Improvements**: Added common prompt parsing utilities to eliminate code duplication between WAN and HunyuanVideo modules. Unified image and video resizing methods for consistency. Improved warning messages in attention modules with actionable guidance.
+    - **Wan2.2 14B Support**: Added support for Wan2.2 14B models (`t2v-A14B` and `i2v-A14B`) with dual-checkpoint architecture for improved quality. See [Wan documentation](./docs/wan.md) for usage details.
 
 - August 2, 2025:
-    - Reduced peak memory usage during model loading for FramePack and Wan2.1 when using `--fp8_scaled`. This reduces VRAM usage during model loading before training and inference.
+    - Reduced peak memory usage during model loading for FramePack and Wan2.1/2.2 when using `--fp8_scaled`. This reduces VRAM usage during model loading before training and inference.
 
 - August 1, 2025:
     - Fixed the issue where block swapping did not work in FLUX. Kontext LoRA training. Thanks to sdbds for [PR #402](https://github.com/kohya-ss/musubi-tuner/pull/402). [PR #403](https://github.com/kohya-ss/musubi-tuner/pull/403).
@@ -362,7 +363,7 @@ For sample image generation during training, refer to [this document](./docs/sam
 
 ### Merging LoRA Weights
 
-Note: Wan2.1 is not supported for merging LoRA weights.
+Note: Wan2.1/2.2 models are not supported for merging LoRA weights.
 
 ```bash
 python src/musubi_tuner/merge_lora.py \
@@ -490,7 +491,7 @@ Specify the input and output file paths with `--input` and `--output`, respectiv
 
 Specify `other` for `--target`. Use `default` to convert from another format to the format of this repository.
 
-Wan2.1 is also supported. 
+Wan2.1 and Wan2.2 are also supported. 
 
 ## Miscellaneous
 

@@ -1,31 +1,63 @@
 > 📝 Click on the language section to expand / 言語をクリックして展開
 
-# Wan 2.1
+# Wan 2.1 / 2.2
 
 ## Overview / 概要
 
-This is an unofficial training and inference script for [Wan2.1](https://github.com/Wan-Video/Wan2.1). The features are as follows.
+This is an unofficial training and inference script for [Wan2.1](https://github.com/Wan-Video/Wan2.1) and Wan2.2 models. The features are as follows.
 
 - fp8 support and memory reduction by block swap: Inference of a 720x1280x81frames videos with 24GB VRAM, training with 720x1280 images with 24GB VRAM
 - Inference without installing Flash attention (using PyTorch's scaled dot product attention)
 - Supports xformers and Sage attention
+- **Wan2.2 support**: Enhanced models with improved quality and dual-checkpoint architecture
 
 This feature is experimental.
 
+### Key Differences: Wan2.1 vs Wan2.2
+
+| Feature | Wan2.1 | Wan2.2 |
+|---------|---------|---------|
+| **Architecture** | Single checkpoint | Dual-checkpoint (low-noise + high-noise) |
+| **Model Tasks** | `t2v-14B`, `i2v-14B`, `t2v-1.3B`, etc. | `t2v-A14B`, `i2v-A14B` |
+| **Default Steps** | 20 steps | 40 steps |
+| **Flow Shift** | 5.0 (most), 3.0 (I2V 480p) | 12.0 (T2V), 5.0 (I2V) |
+| **Guidance Scale** | 5.0 | (3.0, 4.0) for T2V, (3.5, 3.5) for I2V |
+| **Quality** | Good | Enhanced quality with dual-checkpoint |
+| **Command Line** | `--dit model.safetensors` | `--dit low_noise.safetensors --dit_high_noise high_noise.safetensors` |
+
+**Wan2.2 models provide improved quality through their dual-checkpoint architecture but require more careful setup.**
+
 <details>
 <summary>日本語</summary>
-[Wan2.1](https://github.com/Wan-Video/Wan2.1) の非公式の学習および推論スクリプトです。
+[Wan2.1](https://github.com/Wan-Video/Wan2.1) およびWan2.2モデルの非公式の学習および推論スクリプトです。
 
 以下の特徴があります。
 
 - fp8対応およびblock swapによる省メモリ化：720x1280x81framesの動画を24GB VRAMで推論可能、720x1280の画像での学習が24GB VRAMで可能
 - Flash attentionのインストールなしでの実行（PyTorchのscaled dot product attentionを使用）
 - xformersおよびSage attention対応
+- **Wan2.2サポート**: 品質向上とデュアルチェックポイントアーキテクチャを持つ拡張モデル
 
 この機能は実験的なものです。
+
+### 主な違い: Wan2.1 vs Wan2.2
+
+| 機能 | Wan2.1 | Wan2.2 |
+|------|---------|---------|
+| **アーキテクチャ** | シングルチェックポイント | デュアルチェックポイント（低ノイズ+高ノイズ） |
+| **モデルタスク** | `t2v-14B`, `i2v-14B`, `t2v-1.3B` 等 | `t2v-A14B`, `i2v-A14B` |
+| **デフォルトステップ数** | 20ステップ | 40ステップ |
+| **フローシフト** | 5.0（ほとんど）、3.0（I2V 480p） | 12.0（T2V）、5.0（I2V） |
+| **ガイダンススケール** | 5.0 | T2V: (3.0, 4.0)、I2V: (3.5, 3.5) |
+| **品質** | 良好 | デュアルチェックポイントにより品質向上 |
+| **コマンドライン** | `--dit model.safetensors` | `--dit low_noise.safetensors --dit_high_noise high_noise.safetensors` |
+
+**Wan2.2モデルはデュアルチェックポイントアーキテクチャにより品質が向上していますが、より注意深いセットアップが必要です。**
 </details>
 
 ## Download the model / モデルのダウンロード
+
+### Wan2.1 Models
 
 Download the T5 `models_t5_umt5-xxl-enc-bf16.pth` and CLIP `models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth` from the following page: https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-720P/tree/main
 
@@ -34,6 +66,18 @@ Download the VAE from the above page `Wan2.1_VAE.pth` or download `split_files/v
 Download the DiT weights from the following page: https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/tree/main/split_files/diffusion_models
 
 Wan2.1 Fun Control model weights can be downloaded from [here](https://huggingface.co/alibaba-pai/Wan2.1-Fun-14B-Control). Navigate to each weight page and download. The Fun Control model seems to support not only T2V but also I2V tasks.
+
+### Wan2.2 Models
+
+**Wan2.2 14B models use a dual-checkpoint architecture** with separate low-noise and high-noise models for improved quality.
+
+For **Wan2.2 14B models** (`t2v-A14B` and `i2v-A14B`), you need to download:
+- **T5 and VAE**: Same as Wan2.1 (use the same files from above)
+- **DiT Models**: Two separate checkpoint files:
+  - Low-noise model (main model)
+  - High-noise model (companion model for high-noise denoising)
+
+**Note**: Official Wan2.2 model download links are not yet available. Please check the official Wan repositories for model release announcements.
 
 Please select the appropriate weights according to T2V, I2V, resolution, model size, etc. 
 
@@ -55,6 +99,9 @@ Please select the appropriate weights according to T2V, I2V, resolution, model s
 
 <details>
 <summary>日本語</summary>
+
+### Wan2.1モデル
+
 T5 `models_t5_umt5-xxl-enc-bf16.pth` およびCLIP `models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth` を、次のページからダウンロードしてください：https://huggingface.co/Wan-AI/Wan2.1-I2V-14B-720P/tree/main
 
 VAEは上のページから `Wan2.1_VAE.pth` をダウンロードするか、次のページから `split_files/vae/wan_2.1_vae.safetensors` をダウンロードしてください：https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/tree/main/split_files/vae
@@ -62,6 +109,18 @@ VAEは上のページから `Wan2.1_VAE.pth` をダウンロードするか、�
 DiTの重みを次のページからダウンロードしてください：https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/tree/main/split_files/diffusion_models
 
 Wan2.1 Fun Controlモデルの重みは、[こちら](https://huggingface.co/alibaba-pai/Wan2.1-Fun-14B-Control)から、それぞれの重みのページに遷移し、ダウンロードしてください。Fun ControlモデルはT2VだけでなくI2Vタスクにも対応しているようです。
+
+### Wan2.2モデル
+
+**Wan2.2 14Bモデルはデュアルチェックポイントアーキテクチャ**を使用し、品質向上のために低ノイズモデルと高ノイズモデルが分離されています。
+
+**Wan2.2 14Bモデル**（`t2v-A14B`および`i2v-A14B`）については、以下をダウンロードする必要があります：
+- **T5とVAE**: Wan2.1と同じ（上記のファイルと同じものを使用）
+- **DiTモデル**: 2つの独立したチェックポイントファイル：
+  - 低ノイズモデル（メインモデル）
+  - 高ノイズモデル（高ノイズデノイジング用コンパニオンモデル）
+
+**注意**: 公式のWan2.2モデルダウンロードリンクはまだ利用できません。モデルのリリース発表については、公式Wanリポジトリを確認してください。
 
 T2VやI2V、解像度、モデルサイズなどにより適切な重みを選択してください。
 
@@ -140,7 +199,12 @@ The above is an example. The appropriate values for `timestep_sampling` and `dis
 
 For additional options, use `python src/musubi_tuner/wan_train_network.py --help` (note that many options are unverified).
 
-`--task` is one of `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` (for Wan2.1 official models), `t2v-1.3B-FC`, `t2v-14B-FC`, and `i2v-14B-FC` (for Wan2.1 Fun Control model). Specify the DiT weights for the task with `--dit`.
+`--task` is one of:
+- **Wan2.1 models**: `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` (official models)
+- **Wan2.1 Fun Control models**: `t2v-1.3B-FC`, `t2v-14B-FC`, `i2v-14B-FC`
+- **Wan2.2 models**: `t2v-A14B`, `i2v-A14B` (enhanced 14B models with dual-checkpoint architecture)
+
+Specify the DiT weights for the task with `--dit`. For Wan2.2 models, you also need to specify `--dit_high_noise` for the high-noise model checkpoint.
 
 Don't forget to specify `--network_module networks.lora_wan`.
 
@@ -154,7 +218,12 @@ Use `convert_lora.py` for converting the LoRA weights after training, as in Huny
 
 その他のオプションについては `python src/musubi_tuner/wan_train_network.py --help` を使用してください（多くのオプションは未検証です）。
 
-`--task` には `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` （これらはWan2.1公式モデル）、`t2v-1.3B-FC`, `t2v-14B-FC`, `i2v-14B-FC`（Wan2.1-Fun Controlモデル）を指定します。`--dit`に、taskに応じたDiTの重みを指定してください。
+`--task` には以下のいずれかを指定します：
+- **Wan2.1モデル**: `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` （公式モデル）
+- **Wan2.1 Fun Controlモデル**: `t2v-1.3B-FC`, `t2v-14B-FC`, `i2v-14B-FC`
+- **Wan2.2モデル**: `t2v-A14B`, `i2v-A14B` （デュアルチェックポイントアーキテクチャを持つ拡張14Bモデル）
+
+`--dit`に、taskに応じたDiTの重みを指定してください。Wan2.2モデルの場合は、高ノイズモデルチェックポイント用に`--dit_high_noise`も指定する必要があります。
 
  `--network_module` に `networks.lora_wan` を指定することを忘れないでください。
 
@@ -204,7 +273,9 @@ bf16/fp16 > fp8_scaled > fp8 >> fp8_fast
 
 ### T2V Inference / T2V推論
 
-The following is an example of T2V inference (input as a single line):
+#### Wan2.1 T2V Inference
+
+The following is an example of Wan2.1 T2V inference (input as a single line):
 
 ```bash
 python src/musubi_tuner/wan_generate_video.py --fp8 --task t2v-1.3B --video_size  832 480 --video_length 81 --infer_steps 20 
@@ -214,7 +285,24 @@ python src/musubi_tuner/wan_generate_video.py --fp8 --task t2v-1.3B --video_size
 --attn_mode torch
 ```
 
-`--task` is one of `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` (these are Wan2.1 official models), `t2v-1.3B-FC`, `t2v-14B-FC` and `i2v-14B-FC` (for Wan2.1-Fun Control model).
+#### Wan2.2 T2V Inference
+
+For **Wan2.2 models** (`t2v-A14B`), you need to specify both low-noise and high-noise checkpoints:
+
+```bash
+python src/musubi_tuner/wan_generate_video.py --fp8 --task t2v-A14B --video_size 832 480 --video_length 81 --infer_steps 40 
+--prompt "prompt for the video" --save_path path/to/save.mp4 --output_type both 
+--dit path/to/wan2.2_t2v_A14B_low_noise.safetensors --dit_high_noise path/to/wan2.2_t2v_A14B_high_noise.safetensors
+--vae path/to/wan_2.1_vae.safetensors --t5 path/to/models_t5_umt5-xxl-enc-bf16.pth 
+--attn_mode torch
+```
+
+**Note**: Wan2.2 models use different default inference settings (40 steps, different flow shift values) optimized for the dual-checkpoint architecture.
+
+`--task` is one of:
+- **Wan2.1 models**: `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` (official models)
+- **Wan2.1 Fun Control models**: `t2v-1.3B-FC`, `t2v-14B-FC`, `i2v-14B-FC`
+- **Wan2.2 models**: `t2v-A14B`, `i2v-A14B` (enhanced 14B models with dual-checkpoint architecture)
 
 `--attn_mode` is `torch`, `sdpa` (same as `torch`), `xformers`, `sageattn`,`flash2`, `flash` (same as `flash2`) or `flash3`. `torch` is the default. Other options require the corresponding library to be installed. `flash3` (Flash attention 3) is not tested.
 
@@ -262,7 +350,10 @@ Other options are same as `hv_generate_video.py` (some options are not supported
 
 <details>
 <summary>日本語</summary>
-`--task` には `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` （これらはWan2.1公式モデル）、`t2v-1.3B-FC`, `t2v-14B-FC`, `i2v-14B-FC`（Wan2.1-Fun Controlモデル）を指定します。
+`--task` には以下のいずれかを指定します：
+- **Wan2.1モデル**: `t2v-1.3B`, `t2v-14B`, `i2v-14B`, `t2i-14B` （公式モデル）
+- **Wan2.1 Fun Controlモデル**: `t2v-1.3B-FC`, `t2v-14B-FC`, `i2v-14B-FC`
+- **Wan2.2モデル**: `t2v-A14B`, `i2v-A14B` （デュアルチェックポイントアーキテクチャを持つ拡張14Bモデル）
 
 `--attn_mode` には `torch`, `sdpa`（`torch`と同じ）、`xformers`, `sageattn`, `flash2`, `flash`（`flash2`と同じ）, `flash3` のいずれかを指定します。デフォルトは `torch` です。その他のオプションを使用する場合は、対応するライブラリをインストールする必要があります。`flash3`（Flash attention 3）は未テストです。
 
@@ -396,7 +487,9 @@ SD 3.5の実装は[こちら](https://github.com/Stability-AI/sd3.5/blob/main/sd
 
 ### I2V Inference / I2V推論
 
-The following is an example of I2V inference (input as a single line):
+#### Wan2.1 I2V Inference
+
+The following is an example of Wan2.1 I2V inference (input as a single line):
 
 ```bash
 python src/musubi_tuner/wan_generate_video.py --fp8 --task i2v-14B --video_size 832 480 --video_length 81 --infer_steps 20 
@@ -404,6 +497,18 @@ python src/musubi_tuner/wan_generate_video.py --fp8 --task i2v-14B --video_size 
 --dit path/to/wan2.1_i2v_480p_14B_bf16_etc.safetensors --vae path/to/wan_2.1_vae.safetensors 
 --t5 path/to/models_t5_umt5-xxl-enc-bf16.pth --clip path/to/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth 
 --attn_mode torch --image_path path/to/image.jpg
+```
+
+#### Wan2.2 I2V Inference
+
+For **Wan2.2 I2V models** (`i2v-A14B`), you need to specify both checkpoints:
+
+```bash
+python src/musubi_tuner/wan_generate_video.py --fp8 --task i2v-A14B --video_size 832 480 --video_length 81 --infer_steps 40 
+--prompt "prompt for the video" --save_path path/to/save.mp4 --output_type both 
+--dit path/to/wan2.2_i2v_A14B_low_noise.safetensors --dit_high_noise path/to/wan2.2_i2v_A14B_high_noise.safetensors
+--vae path/to/wan_2.1_vae.safetensors --t5 path/to/models_t5_umt5-xxl-enc-bf16.pth 
+--clip path/to/models_clip_open-clip-xlm-roberta-large-vit-huge-14.pth --attn_mode torch --image_path path/to/image.jpg
 ```
 
 Add `--clip` to specify the CLIP model. `--image_path` is the path to the image to be used as the initial frame.

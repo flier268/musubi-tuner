@@ -46,6 +46,8 @@ from musubi_tuner.dataset.image_video_dataset import ARCHITECTURE_HUNYUAN_VIDEO
 import logging
 
 from musubi_tuner.utils import huggingface_utils, model_utils, train_utils, sai_model_spec
+from musubi_tuner.utils.prompt_utils import parse_hv_prompt_line
+from musubi_tuner.utils.device_utils import clean_memory_on_device
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -53,22 +55,7 @@ logging.basicConfig(level=logging.INFO)
 
 BASE_MODEL_VERSION_HUNYUAN_VIDEO = "hunyuan_video"
 
-# TODO make separate file for some functions to commonize with other scripts
-
-
-def clean_memory_on_device(device: torch.device):
-    r"""
-    Clean memory on the specified device, will be called from training scripts.
-    """
-    gc.collect()
-
-    # device may "cuda" or "cuda:0", so we need to check the type of device
-    if device.type == "cuda":
-        torch.cuda.empty_cache()
-    if device.type == "xpu":
-        torch.xpu.empty_cache()
-    if device.type == "mps":
-        torch.mps.empty_cache()
+# Moved clean_memory_on_device to utils.device_utils for commonization
 
 
 # for collate_fn: epoch and step is multiprocessing.Value

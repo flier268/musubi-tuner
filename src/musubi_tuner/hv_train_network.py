@@ -48,6 +48,7 @@ from musubi_tuner.hv_generate_video import save_images_grid, save_videos_grid, r
 import logging
 
 from musubi_tuner.utils import huggingface_utils, model_utils, train_utils, sai_model_spec
+from musubi_tuner.utils.prompt_utils import parse_hv_prompt_line
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -181,92 +182,16 @@ def prepare_accelerator(args: argparse.Namespace) -> Accelerator:
 
 
 def line_to_prompt_dict(line: str) -> dict:
-    # subset of gen_img_diffusers
-    prompt_args = line.split(" --")
-    prompt_dict = {}
-    prompt_dict["prompt"] = prompt_args[0]
-
-    for parg in prompt_args:
-        try:
-            m = re.match(r"w (\d+)", parg, re.IGNORECASE)
-            if m:
-                prompt_dict["width"] = int(m.group(1))
-                continue
-
-            m = re.match(r"h (\d+)", parg, re.IGNORECASE)
-            if m:
-                prompt_dict["height"] = int(m.group(1))
-                continue
-
-            m = re.match(r"f (\d+)", parg, re.IGNORECASE)
-            if m:
-                prompt_dict["frame_count"] = int(m.group(1))
-                continue
-
-            m = re.match(r"d (\d+)", parg, re.IGNORECASE)
-            if m:
-                prompt_dict["seed"] = int(m.group(1))
-                continue
-
-            m = re.match(r"s (\d+)", parg, re.IGNORECASE)
-            if m:  # steps
-                prompt_dict["sample_steps"] = max(1, min(1000, int(m.group(1))))
-                continue
-
-            m = re.match(r"g ([\d\.]+)", parg, re.IGNORECASE)
-            if m:  # scale
-                prompt_dict["guidance_scale"] = float(m.group(1))
-                continue
-
-            m = re.match(r"fs ([\d\.]+)", parg, re.IGNORECASE)
-            if m:  # scale
-                prompt_dict["discrete_flow_shift"] = float(m.group(1))
-                continue
-
-            m = re.match(r"l ([\d\.]+)", parg, re.IGNORECASE)
-            if m:  # scale
-                prompt_dict["cfg_scale"] = float(m.group(1))
-                continue
-
-            m = re.match(r"n (.+)", parg, re.IGNORECASE)
-            if m:  # negative prompt
-                prompt_dict["negative_prompt"] = m.group(1)
-                continue
-
-            m = re.match(r"i (.+)", parg, re.IGNORECASE)
-            if m:  # image path
-                prompt_dict["image_path"] = m.group(1)
-                continue
-
-            m = re.match(r"ei (.+)", parg, re.IGNORECASE)
-            if m:  # end image path
-                prompt_dict["end_image_path"] = m.group(1)
-                continue
-
-            m = re.match(r"cn (.+)", parg, re.IGNORECASE)
-            if m:
-                prompt_dict["control_video_path"] = m.group(1)
-                continue
-
-            m = re.match(r"ci (.+)", parg, re.IGNORECASE)
-            if m:
-                # can be multiple control images
-                control_image_path = m.group(1)
-                if "control_image_path" not in prompt_dict:
-                    prompt_dict["control_image_path"] = []
-                prompt_dict["control_image_path"].append(control_image_path)
-                continue
-
-            m = re.match(r"of (.+)", parg, re.IGNORECASE)
-            if m:  # output folder
-                prompt_dict["one_frame"] = m.group(1)
-                continue
-
-        except ValueError as ex:
-            logger.error(f"Exception in parsing / 解析エラー: {parg}")
-            logger.error(ex)
-
-    return prompt_dict
+    """Parse a prompt line into a dictionary of argument overrides
+    
+    Args:
+        line: Prompt line with options
+        
+    Returns:
+        dict: Dictionary of parsed arguments
+    """
+    # Use common function from prompt_utils
+    return parse_hv_prompt_line(line)
 
 
 def load_prompts(prompt_file: str) -> list[Dict]:

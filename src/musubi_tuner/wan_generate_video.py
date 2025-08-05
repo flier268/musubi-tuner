@@ -42,6 +42,7 @@ except:
 
 from musubi_tuner.utils.model_utils import str_to_dtype
 from musubi_tuner.utils.device_utils import clean_memory_on_device
+from musubi_tuner.utils.prompt_utils import parse_wan_prompt_line
 from musubi_tuner.hv_generate_video import get_time_flag, save_images_grid, save_videos_grid, synchronize_device
 from musubi_tuner.dataset.image_video_dataset import load_video
 
@@ -257,61 +258,8 @@ def parse_prompt_line(line: str) -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Dictionary of argument overrides
     """
-    # TODO common function with hv_train_network.line_to_prompt_dict
-    parts = line.split(" --")
-    prompt = parts[0].strip()
-
-    # Create dictionary of overrides
-    overrides = {"prompt": prompt}
-    # Initialize control_image_path and control_image_mask_path as a list to accommodate multiple paths
-    overrides["control_image_path"] = []
-    overrides["control_image_mask_path"] = []
-
-    for part in parts[1:]:
-        if not part.strip():
-            continue
-        option_parts = part.split(" ", 1)
-        option = option_parts[0].strip()
-        value = option_parts[1].strip() if len(option_parts) > 1 else ""
-
-        # Map options to argument names
-        if option == "w":
-            overrides["video_size_width"] = int(value)
-        elif option == "h":
-            overrides["video_size_height"] = int(value)
-        elif option == "f":
-            overrides["video_length"] = int(value)
-        elif option == "d":
-            overrides["seed"] = int(value)
-        elif option == "s":
-            overrides["infer_steps"] = int(value)
-        elif option == "g" or option == "l":
-            overrides["guidance_scale"] = float(value)
-        elif option == "fs":
-            overrides["flow_shift"] = float(value)
-        elif option == "i":
-            overrides["image_path"] = value
-        elif option == "ei":
-            overrides["end_image_path"] = value
-        elif option == "cn":
-            overrides["control_path"] = value
-        elif option == "n":
-            overrides["negative_prompt"] = value
-        # one frame inference options
-        elif option == "ci":  # control_image_path
-            overrides["control_image_path"].append(value)
-        elif option == "cim":  # control_image_mask_path
-            overrides["control_image_mask_path"].append(value)
-        elif option == "of":  # one_frame_inference
-            overrides["one_frame_inference"] = value
-
-    # If no control_image_path was provided, remove the empty list
-    if not overrides["control_image_path"]:
-        del overrides["control_image_path"]
-    if not overrides["control_image_mask_path"]:
-        del overrides["control_image_mask_path"]
-
-    return overrides
+    # Use common function from prompt_utils
+    return parse_wan_prompt_line(line)
 
 
 def apply_overrides(args: argparse.Namespace, overrides: Dict[str, Any]) -> argparse.Namespace:
@@ -861,7 +809,7 @@ def prepare_t2v_inputs(
 
     # Fun-Control: encode control video to latent space
     if config.is_fun_control:
-        # TODO use same resizing as for image
+        # Uses same resizing method as for images
         logger.info(f"Encoding control video to latent space")
         # C, F, H, W
         control_video = load_control_video(args.control_path, frames, height, width).to(device)
@@ -1158,7 +1106,7 @@ def prepare_i2v_inputs(
 
         # Fun-Control: encode control video to latent space
         if config.is_fun_control:
-            # TODO use same resizing as for image
+            # Uses same resizing method as for images
             logger.info(f"Encoding control video to latent space")
             # C, F, H, W
             control_video = load_control_video(args.control_path, frames + (1 if has_end_image else 0), height, width).to(device)
@@ -1219,13 +1167,30 @@ def load_control_video(control_path: str, frames: int, height: int, width: int) 
         torch.Tensor: control video latent, CFHW
     """
     logger.info(f"Load control video from {control_path}")
-    video = load_video(control_path, 0, frames, bucket_reso=(width, height))  # list of frames
+    # Use consistent resizing method as for images
+    video = load_video(control_path, 0, frames, bucket_reso=None)  # list of frames
     if len(video) < frames:
         raise ValueError(f"Video length is less than {frames}")
-    # video = np.stack(video, axis=0)  # F, H, W, C
-    video = torch.stack([TF.to_tensor(frame).sub_(0.5).div_(0.5) for frame in video], dim=0)  # F, C, H, W, -1 to 1
-    video = video.permute(1, 0, 2, 3)  # C, F, H, W
-    return video
+    
+    # Apply same resizing as images for consistency
+    resized_frames = []
+    for frame in video:
+        if isinstance(frame, Image.Image):
+            frame_np = np.array(frame)
+        else:
+            frame_np = frame
+        
+        # Use same resizing method as for images
+        frame_np = image_video_dataset.resize_image_to_bucket(frame_np, (width, height))
+        resized_frames.append(frame_np)
+    
+    # Convert to tensor with same preprocessing as images
+    video_tensor = torch.stack([
+        TF.to_tensor(Image.fromarray(frame)).sub_(0.5).div_(0.5) 
+        for frame in resized_frames
+    ], dim=0)  # F, C, H, W, -1 to 1
+    video_tensor = video_tensor.permute(1, 0, 2, 3)  # C, F, H, W
+    return video_tensor
 
 
 def setup_scheduler(args: argparse.Namespace, config, device: torch.device) -> Tuple[Any, torch.Tensor]:

@@ -37,9 +37,9 @@
 
 ## はじめに
 
-このリポジトリは、HunyuanVideo、Wan2.1、FramePack、FLUX.1 KontextのLoRA学習用のコマンドラインツールです。このリポジトリは非公式であり、公式のHunyuanVideoやWan2.1、FramePack、FLUX.1 Kontextのリポジトリとは関係ありません。
+このリポジトリは、HunyuanVideo、Wan2.1/2.2、FramePack、FLUX.1 KontextのLoRA学習用のコマンドラインツールです。このリポジトリは非公式であり、公式のHunyuanVideoやWan2.1/2.2、FramePack、FLUX.1 Kontextのリポジトリとは関係ありません。
 
-Wan2.1については、[Wan2.1のドキュメント](./docs/wan.md)も参照してください。FramePackについては、[FramePackのドキュメント](./docs/framepack.md)を、FLUX.1 Kontextについては[FLUX.1 Kontextのドキュメント](./docs/flux_kontext.md)を参照してください。
+Wan2.1/2.2については、[Wan2.1/2.2のドキュメント](./docs/wan.md)も参照してください。FramePackについては、[FramePackのドキュメント](./docs/framepack.md)を、FLUX.1 Kontextについては[FLUX.1 Kontextのドキュメント](./docs/flux_kontext.md)を参照してください。
 
 *リポジトリは開発中です。*
 
@@ -52,8 +52,12 @@ Wan2.1については、[Wan2.1のドキュメント](./docs/wan.md)も参照し
 
 - GitHub Discussionsを有効にしました。コミュニティのQ&A、知識共有、技術情報の交換などにご利用ください。バグ報告や機能リクエストにはIssuesを、質問や経験の共有にはDiscussionsをご利用ください。[Discussionはこちら](https://github.com/kohya-ss/musubi-tuner/discussions)
 
+- 2025/08/05
+    - **コード品質の改善**: WANとHunyuanVideoモジュール間のコード重複を排除するため、共通のプロンプト解析ユーティリティを追加しました。画像と動画のリサイズ方法を統一し、一貫性を向上させました。Attentionモジュールの警告メッセージを改善し、実用的なガイダンスを提供するようにしました。
+    - **Wan2.2 14Bサポート**: 品質向上のためのデュアルチェックポイントアーキテクチャを持つWan2.2 14Bモデル（`t2v-A14B`および`i2v-A14B`）のサポートを追加しました。使用方法については[Wanドキュメント](./docs/wan.md)を参照してください。
+
 - 2025/08/02
-    - `--fp8_scaled`を指定したときのFramePack、Wan2.1のモデル読み込みのピークメモリ使用量を削減しました。これにより、学習、推論前のモデル読み込み時のVRAM使用量が削減されます。
+    - `--fp8_scaled`を指定したときのFramePack、Wan2.1/2.2のモデル読み込みのピークメモリ使用量を削減しました。これにより、学習、推論前のモデル読み込み時のVRAM使用量が削減されます。
 
 - 2025/08/01
     - FLUX. KontextのLoRA学習でblock swapが動作しない不具合を修正しました。[PR #402](https://github.com/kohya-ss/musubi-tuner/pull/402) および [PR #403](https://github.com/kohya-ss/musubi-tuner/pull/403) sdbds氏に感謝します。
@@ -322,7 +326,7 @@ PyTorch Dynamoによる最適化を行う場合は、[こちら](./docs/advanced
 
 ### LoRAの重みのマージ
 
-注：Wan 2.1には対応していません。
+注：Wan 2.1/2.2には対応していません。
 
 ```bash
 python src/musubi_tuner/merge_lora.py \
@@ -414,7 +418,7 @@ python src/musubi_tuner/convert_lora.py --input path/to/musubi_lora.safetensors 
 
 `--target`には`other`を指定してください。`default`を指定すると、他の形式から当リポジトリの形式に変換できます。
 
-Wan2.1も対応済みです。
+Wan2.1および2.2も対応済みです。
 
 ## その他
 

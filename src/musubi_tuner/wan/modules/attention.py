@@ -298,7 +298,9 @@ def attention(
     else:
         if q_lens is not None or k_lens is not None:
             warnings.warn(
-                "Padding mask is disabled when using scaled_dot_product_attention. It can have a significant impact on performance."
+                "Padding mask is disabled when using scaled_dot_product_attention, which can significantly impact performance. "
+                "Consider using FlashAttention (attn_mode='flash') for better performance with sequence padding.",
+                UserWarning
             )
         attn_mask = None
 
